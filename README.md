@@ -1,5 +1,3 @@
-![status: work in progress](https://img.shields.io/badge/status-WIP-yellow)
-
 # Namespace description and resource gloss for WBDL (Webbase Description Language) 
 Latest Version: 31 January 2023 
 
