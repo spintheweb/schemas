@@ -2,19 +2,16 @@
     "$schema": "https://json-schema.org/draft/2020-12/schema",
     "$id": "https://schemas.spintheweb.org/wbdl2.0.json",
     "title": "Webbase Description Language",
-    "description": "A language for describing sites",
+    "description": "A language for describing web portals, their structure, and content.",
     "type": "object",
     "properties": {
         "_id": {
             "description": "The unique identifier of the webbase",
             "type": "string",
-            "format": "uuid"
-        },
-        "_idParent": {
-            "type": "string",
-            "format": "uuid"
+            "pattern": "^[0-9a-zA-Z]{22}$"
         },
         "type": {
+            "description": "The type of the object (site is a singleton)",
             "type": "string",
             "enum": [
                 "site",
@@ -25,13 +22,6 @@
         },
         "name": {
             "$ref": "#/$defs/translation"
-        },
-        "status": {
-            "type": [
-                "string",
-                "null"
-            ],
-            "pattern": "^([A-Z])$"
         },
         "visibility": {
             "type": [
@@ -54,6 +44,12 @@
             }
         }
     },
+    "required": [
+        "type",
+        "_id",
+        "name",
+        "slug"
+    ],
     "unevaluatedProperties": false,
     "allOf": [
         {
@@ -75,11 +71,12 @@
                         "format": "uri"
                     },
                     "mainpage": {
+                        "description": "The main page identifier",
                         "type": [
                             "string",
                             "null"
                         ],
-                        "format": "uuid"
+                        "pattern": "^[0-9a-zA-Z]{22}$"
                     },
                     "slug": {
                         "type": "string",
@@ -93,6 +90,28 @@
                     },
                     "description": {
                         "$ref": "#/$defs/translation"
+                    },
+                    "children": {
+                        "description": "Child objects of type area, page, or content",
+                        "type": "array",
+                        "items": {
+                            "allOf": [
+                                {
+                                    "$ref": "#"
+                                },
+                                {
+                                    "properties": {
+                                        "type": {
+                                            "enum": [
+                                                "area",
+                                                "page",
+                                                "content"
+                                            ]
+                                        }
+                                    }
+                                }
+                            ]
+                        }
                     }
                 }
             }
@@ -108,11 +127,12 @@
             "then": {
                 "properties": {
                     "mainpage": {
+                        "description": "The main page identifier",
                         "type": [
                             "string",
                             "null"
                         ],
-                        "format": "uuid"
+                        "pattern": "^[0-9a-zA-Z]{22}$"
                     },
                     "icon": {
                         "type": "string"
@@ -125,6 +145,28 @@
                     },
                     "slug": {
                         "$ref": "#/$defs/translation"
+                    },
+                    "children": {
+                        "description": "Child objects of type area, page, or content",
+                        "type": "array",
+                        "items": {
+                            "allOf": [
+                                {
+                                    "$ref": "#"
+                                },
+                                {
+                                    "properties": {
+                                        "type": {
+                                            "enum": [
+                                                "area",
+                                                "page",
+                                                "content"
+                                            ]
+                                        }
+                                    }
+                                }
+                            ]
+                        }
                     }
                 }
             }
@@ -153,6 +195,26 @@
                     },
                     "template": {
                         "type": "string"
+                    },
+                    "children": {
+                        "description": "Child objects of type content only",
+                        "type": "array",
+                        "items": {
+                            "allOf": [
+                                {
+                                    "$ref": "#"
+                                },
+                                {
+                                    "properties": {
+                                        "type": {
+                                            "enum": [
+                                                "content"
+                                            ]
+                                        }
+                                    }
+                                }
+                            ]
+                        }
                     }
                 }
             }
@@ -204,7 +266,8 @@
                     "layout": {
                         "$ref": "#/$defs/translation"
                     },
-                    "cssCLass": {
+                    "cssClass": {
+                        "description": "CSS class for styling",
                         "type": "string"
                     }
                 }
