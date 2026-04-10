@@ -180,7 +180,7 @@ END;
 -- =============================================
 -- Author:		Giancarlo Trevisan
 -- Create date: 2023/02/05
--- Description:	Create WBDL.json
+-- Description:	Create WBOL.json
 -- Usage:		exec dbo.spSTW 'it'
 -- =============================================
 CREATE PROCEDURE dbo.spSTW(@lang varchar(5) = 'en')

@@ -1,0 +1,247 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://schemas.spintheweb.org/wbol3.0.json",
+    "title": "Webbase Ontology Language 3.0",
+    "description": "Schema for WBOL — a language describing web portals, their structure, and content.",
+    "$ref": "#/$defs/site",
+    "$defs": {
+
+        "id": {
+            "description": "A unique WBOL object identifier (alphanumeric, 20–25 chars)",
+            "type": "string",
+            "pattern": "^[0-9a-zA-Z]{20,25}$"
+        },
+
+        "translation": {
+            "description": "A locale-keyed map of strings (e.g. { \"en\": \"...\", \"it-IT\": \"...\" })",
+            "type": "object",
+            "patternProperties": {
+                "^[a-z]{2}(-[A-Z]{2})?$": {
+                    "type": "string"
+                }
+            },
+            "additionalProperties": false
+        },
+
+        "visibility": {
+            "description": "Per-role visibility flags (role name → boolean or null)",
+            "type": "object",
+            "patternProperties": {
+                "^[a-z0-9_]{1,50}$": {
+                    "type": ["boolean", "null"]
+                }
+            },
+            "additionalProperties": false
+        },
+
+        "option": {
+            "description": "A navigation option used in Menus and Tabs content subtypes",
+            "type": "object",
+            "properties": {
+                "name": {
+                    "description": "Display name. Use { \"en\": \"-\" } for a separator.",
+                    "$ref": "#/$defs/translation"
+                },
+                "ref": {
+                    "description": "Target: a WBOL _id, a relative path, or a full URL",
+                    "type": "string"
+                },
+                "options": {
+                    "description": "Nested sub-options (recursive, for Menus submenus)",
+                    "type": "array",
+                    "items": { "$ref": "#/$defs/option" }
+                }
+            },
+            "additionalProperties": false
+        },
+
+        "content": {
+            "description": "A leaf content object rendered inside a page section",
+            "type": "object",
+            "required": ["_id", "type", "name", "slug", "subtype"],
+            "properties": {
+                "_id":        { "$ref": "#/$defs/id" },
+                "type":       { "type": "string", "const": "Content" },
+                "name":       { "$ref": "#/$defs/translation" },
+                "slug":       { "$ref": "#/$defs/translation" },
+                "visibility": { "$ref": "#/$defs/visibility" },
+                "subtype": {
+                    "description": "The rendering type of the content",
+                    "type": "string",
+                    "enum": [
+                        "Text",
+                        "Form",
+                        "Table",
+                        "List",
+                        "Tree",
+                        "Tabs",
+                        "Menus",
+                        "Calendar",
+                        "Breadcrumbs",
+                        "Languages"
+                    ]
+                },
+                "section": {
+                    "description": "The page section slot this content is placed in",
+                    "type": "string"
+                },
+                "sequence": {
+                    "description": "Ordering position within the section (number or numeric string)",
+                    "type": ["string", "number"]
+                },
+                "cssClass": {
+                    "description": "CSS class for styling",
+                    "type": ["string", "null"]
+                },
+                "contentType": {
+                    "description": "MIME type of the content output",
+                    "type": "string"
+                },
+                "dsn": {
+                    "description": "Data source name — references a key in the site datasources map",
+                    "type": ["string", "null"]
+                },
+                "command": {
+                    "description": "Query or command to execute against the data source (SQL, shell, JSONata, etc.)",
+                    "type": ["string", "null"]
+                },
+                "params": {
+                    "description": "URL-encoded parameters passed to the command (e.g. \"id=3&id=5\")",
+                    "type": ["string", "null"]
+                },
+                "layout": {
+                    "description": "WBLL (Webbase Layout Language) template, per locale",
+                    "$ref": "#/$defs/translation"
+                },
+                "options": {
+                    "description": "Navigation options for Menus and Tabs subtypes",
+                    "type": "array",
+                    "items": { "$ref": "#/$defs/option" }
+                }
+            },
+            "additionalProperties": false
+        },
+
+        "page": {
+            "description": "A page containing content objects, rendered with a template",
+            "type": "object",
+            "required": ["_id", "type", "name", "slug"],
+            "properties": {
+                "_id":         { "$ref": "#/$defs/id" },
+                "type":        { "type": "string", "const": "Page" },
+                "name":        { "$ref": "#/$defs/translation" },
+                "slug":        { "$ref": "#/$defs/translation" },
+                "visibility":  { "$ref": "#/$defs/visibility" },
+                "keywords":    { "$ref": "#/$defs/translation" },
+                "description": { "$ref": "#/$defs/translation" },
+                "contentType": {
+                    "description": "MIME type of the page output (e.g. \"text/html\")",
+                    "type": "string"
+                },
+                "template": {
+                    "description": "Template file name used to render this page",
+                    "type": "string"
+                },
+                "children": {
+                    "description": "Content objects belonging to this page",
+                    "type": "array",
+                    "items": { "$ref": "#/$defs/content" }
+                }
+            },
+            "additionalProperties": false
+        },
+
+        "area": {
+            "description": "A navigational area grouping pages and nested areas",
+            "type": "object",
+            "required": ["_id", "type", "name", "slug"],
+            "properties": {
+                "_id":         { "$ref": "#/$defs/id" },
+                "type":        { "type": "string", "const": "Area" },
+                "name":        { "$ref": "#/$defs/translation" },
+                "slug":        { "$ref": "#/$defs/translation" },
+                "visibility":  { "$ref": "#/$defs/visibility" },
+                "keywords":    { "$ref": "#/$defs/translation" },
+                "description": { "$ref": "#/$defs/translation" },
+                "icon": {
+                    "description": "Icon identifier or CSS class for this area",
+                    "type": "string"
+                },
+                "mainpage": {
+                    "description": "The _id of the default page, or empty string for none",
+                    "type": "string"
+                },
+                "children": {
+                    "description": "Nested areas and pages within this area",
+                    "type": "array",
+                    "items": {
+                        "oneOf": [
+                            { "$ref": "#/$defs/area" },
+                            { "$ref": "#/$defs/page" }
+                        ]
+                    }
+                }
+            },
+            "additionalProperties": false
+        },
+
+        "site": {
+            "description": "The root site object — singleton, describes the entire webbase",
+            "type": "object",
+            "required": ["_id", "type", "name"],
+            "properties": {
+                "_id":         { "$ref": "#/$defs/id" },
+                "type":        { "type": "string", "const": "Site" },
+                "name":        { "$ref": "#/$defs/translation" },
+                "visibility":  { "$ref": "#/$defs/visibility" },
+                "keywords":    { "$ref": "#/$defs/translation" },
+                "description": { "$ref": "#/$defs/translation" },
+                "icon": {
+                    "description": "Icon identifier or CSS class for this site",
+                    "type": "string"
+                },
+                "slug": {
+                    "description": "Canonical base URL of the site",
+                    "type": "string",
+                    "format": "uri"
+                },
+                "mainpage": {
+                    "description": "The _id of the site's home/default page",
+                    "type": "string"
+                },
+                "langs": {
+                    "description": "List of supported locale codes (e.g. [\"en\", \"it-IT\"])",
+                    "type": "array",
+                    "items": {
+                        "type": "string",
+                        "pattern": "^[a-z]{2}(-[A-Z]{2})?$"
+                    },
+                    "minItems": 1
+                },
+                "datasources": {
+                    "description": "Named data source definitions (name → connection string or URL)",
+                    "type": "object",
+                    "patternProperties": {
+                        "^[a-z0-9_]{1,50}$": {
+                            "type": "string"
+                        }
+                    },
+                    "additionalProperties": false
+                },
+                "children": {
+                    "description": "Top-level areas, pages, and content objects of the site",
+                    "type": "array",
+                    "items": {
+                        "oneOf": [
+                            { "$ref": "#/$defs/area" },
+                            { "$ref": "#/$defs/page" },
+                            { "$ref": "#/$defs/content" }
+                        ]
+                    }
+                }
+            },
+            "additionalProperties": false
+        }
+
+    }
+}
