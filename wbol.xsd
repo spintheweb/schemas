@@ -1,260 +1,270 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
-           xmlns="wbol"
-           xmlns:wbl="wbol"
-           xmlns:xml="http://www.w3.org/XML/1998/namespace"
-           targetNamespace="wbol"
-           version="1.0"
-           elementFormDefault="qualified"
-           attributeFormDefault="unqualified">
-
+  xmlns="https://spintheweb.org/schemas/wbol.xsd"
+  xmlns:wbol="https://spintheweb.org/schemas/wbol.xsd"
+  targetNamespace="https://spintheweb.org/schemas/wbol.xsd"
+  elementFormDefault="qualified"
+  attributeFormDefault="unqualified"
+  version="1.0">
   <xs:import namespace="http://www.w3.org/XML/1998/namespace"
-             schemaLocation="http://www.w3.org/2001/xml.xsd"/>
-
+    schemaLocation="http://www.w3.org/2001/xml.xsd" />
   <xs:element name="webbase" type="WebbaseType">
+    <!-- Keys for area, page, and content GUIDs -->
     <xs:key name="areaGuids">
-      <xs:selector xpath=".//wbl:area | .//wbl:webbaselet"/>
-      <xs:field xpath="@guid"/>
+      <xs:selector xpath=".//wbol:area | .//wbol:webbaselet" />
+      <xs:field xpath="@guid" />
     </xs:key>
     <xs:key name="pageGuids">
-      <xs:selector xpath=".//wbl:page"/>
-      <xs:field xpath="@guid"/>
+      <xs:selector xpath=".//wbol:page" />
+      <xs:field xpath="@guid" />
     </xs:key>
     <xs:key name="contentGuids">
-      <xs:selector xpath=".//wbl:content"/>
-      <xs:field xpath="@guid"/>
+      <xs:selector xpath=".//wbol:content" />
+      <xs:field xpath="@guid" />
     </xs:key>
-    <xs:keyref name="homepageRef" refer="wbl:pageGuids">
-      <xs:selector xpath="."/>
-      <xs:field xpath="@homepage"/>
+    <xs:key name="navigableGuids">
+      <xs:selector xpath=". | .//wbol:area | .//wbol:webbaselet | .//wbol:page | .//wbol:content" />
+      <xs:field xpath="@guid" />
+    </xs:key>
+    <!-- Keyrefs referencing the above keys (must be in scope) -->
+    <xs:keyref name="homepageRef" refer="pageGuids">
+      <xs:selector xpath="." />
+      <xs:field xpath="@homepage" />
     </xs:keyref>
-    <xs:keyref name="shortcutContentRef" refer="wbl:contentGuids">
-      <xs:selector xpath=".//wbl:shortcut"/>
-      <xs:field xpath="@content"/>
+    <xs:keyref name="shortcutTargetRef" refer="contentGuids">
+      <xs:selector xpath=".//wbol:shortcut" />
+      <xs:field xpath="@target" />
     </xs:keyref>
-    <xs:keyref name="areaMainpageRef" refer="wbl:pageGuids">
-      <xs:selector xpath=".//wbl:area | .//wbl:webbaselet"/>
-      <xs:field xpath="@mainpage"/>
+    <xs:keyref name="areaMainpageRef" refer="pageGuids">
+      <xs:selector xpath=".//wbol:area | .//wbol:webbaselet" />
+      <xs:field xpath="@mainpage" />
     </xs:keyref>
-    <xs:keyref name="tabsOptionContentRef" refer="wbl:contentGuids">
-      <xs:selector xpath=".//wbl:tabsOptions/wbl:option"/>
-      <xs:field xpath="@guid"/>
+    <xs:keyref name="optionTargetRef" refer="navigableGuids">
+      <xs:annotation>
+        <xs:documentation>Every option target must resolve to a guid in scope (webbase, area, webbaselet, page, or content). Type-specific rules (menu vs tabs/accordion) are semantic constraints and should be enforced by runtime logic or XSD 1.1 assertions.</xs:documentation>
+      </xs:annotation>
+      <xs:selector xpath=".//wbol:content/wbol:options/wbol:option" />
+      <xs:field xpath="@target" />
     </xs:keyref>
-    <xs:keyref name="menuAreaOptionRef" refer="wbl:areaGuids">
-      <xs:selector xpath=".//wbl:menuOptions/wbl:areaOption"/>
-      <xs:field xpath="@guid"/>
-    </xs:keyref>
-    <xs:keyref name="menuPageOptionRef" refer="wbl:pageGuids">
-      <xs:selector xpath=".//wbl:menuOptions/wbl:pageOption"/>
-      <xs:field xpath="@guid"/>
-    </xs:keyref>
-    <xs:keyref name="menuContentOptionRef" refer="wbl:contentGuids">
-      <xs:selector xpath=".//wbl:menuOptions/wbl:contentOption"/>
-      <xs:field xpath="@guid"/>
-    </xs:keyref>
+    <!-- Keys and keyrefs for roles -->
     <xs:key name="portalRoleIds">
-      <xs:selector xpath="wbl:roles/wbl:role"/>
-      <xs:field xpath="@id"/>
+      <xs:selector xpath="wbol:roles/wbol:role" />
+      <xs:field xpath="@id" />
     </xs:key>
-    <xs:keyref name="visibilityRoleRefs" refer="wbl:portalRoleIds">
-      <xs:selector xpath=".//wbl:visibilities/wbl:role"/>
-      <xs:field xpath="@id"/>
+    <xs:keyref name="visibilityRoleRefs" refer="portalRoleIds">
+      <xs:selector xpath=".//wbol:visibilities/wbol:role" />
+      <xs:field xpath="@id" />
     </xs:keyref>
   </xs:element>
 
-  <xs:element name="webbaselet" type="AreaType">
+  <xs:element name="webbaselet" type="WebbaseletType">
     <xs:key name="areaGuidsInWebbaselet">
-      <xs:selector xpath=". | .//wbl:area | .//wbl:webbaselet"/>
-      <xs:field xpath="@guid"/>
+      <xs:selector xpath=". | .//wbol:area | .//wbol:webbaselet" />
+      <xs:field xpath="@guid" />
     </xs:key>
     <xs:key name="pageGuidsInWebbaselet">
-      <xs:selector xpath=".//wbl:page"/>
-      <xs:field xpath="@guid"/>
+      <xs:selector xpath=".//wbol:page" />
+      <xs:field xpath="@guid" />
     </xs:key>
     <xs:key name="contentGuidsInWebbaselet">
-      <xs:selector xpath=".//wbl:content"/>
-      <xs:field xpath="@guid"/>
+      <xs:selector xpath=".//wbol:content" />
+      <xs:field xpath="@guid" />
     </xs:key>
-    <xs:keyref name="webbaseletMainpageRef" refer="wbl:pageGuidsInWebbaselet">
-      <xs:selector xpath="."/>
-      <xs:field xpath="@mainpage"/>
+    <xs:key name="navigableGuidsInWebbaselet">
+      <xs:selector xpath=". | .//wbol:area | .//wbol:webbaselet | .//wbol:page | .//wbol:content" />
+      <xs:field xpath="@guid" />
+    </xs:key>
+    <xs:keyref name="webbaseletMainpageRef" refer="pageGuidsInWebbaselet">
+      <xs:selector xpath="." />
+      <xs:field xpath="@mainpage" />
     </xs:keyref>
-    <xs:keyref name="shortcutContentRefInWebbaselet" refer="wbl:contentGuidsInWebbaselet">
-      <xs:selector xpath=".//wbl:shortcut"/>
-      <xs:field xpath="@content"/>
+    <xs:keyref name="shortcutTargetRefInWebbaselet" refer="contentGuidsInWebbaselet">
+      <xs:selector xpath=".//wbol:shortcut" />
+      <xs:field xpath="@target" />
     </xs:keyref>
-    <xs:keyref name="areaMainpageRefInWebbaselet" refer="wbl:pageGuidsInWebbaselet">
-      <xs:selector xpath=". | .//wbl:area | .//wbl:webbaselet"/>
-      <xs:field xpath="@mainpage"/>
+    <xs:keyref name="areaMainpageRefInWebbaselet" refer="pageGuidsInWebbaselet">
+      <xs:selector xpath=". | .//wbol:area | .//wbol:webbaselet" />
+      <xs:field xpath="@mainpage" />
     </xs:keyref>
-    <xs:keyref name="tabsOptionContentRefInWebbaselet" refer="wbl:contentGuidsInWebbaselet">
-      <xs:selector xpath=".//wbl:tabsOptions/wbl:option"/>
-      <xs:field xpath="@guid"/>
-    </xs:keyref>
-    <xs:keyref name="menuAreaOptionRefInWebbaselet" refer="wbl:areaGuidsInWebbaselet">
-      <xs:selector xpath=".//wbl:menuOptions/wbl:areaOption"/>
-      <xs:field xpath="@guid"/>
-    </xs:keyref>
-    <xs:keyref name="menuPageOptionRefInWebbaselet" refer="wbl:pageGuidsInWebbaselet">
-      <xs:selector xpath=".//wbl:menuOptions/wbl:pageOption"/>
-      <xs:field xpath="@guid"/>
-    </xs:keyref>
-    <xs:keyref name="menuContentOptionRefInWebbaselet" refer="wbl:contentGuidsInWebbaselet">
-      <xs:selector xpath=".//wbl:menuOptions/wbl:contentOption"/>
-      <xs:field xpath="@guid"/>
+    <xs:keyref name="optionTargetRefInWebbaselet" refer="navigableGuidsInWebbaselet">
+      <xs:annotation>
+        <xs:documentation>Every option target in a webbaselet must resolve to a guid in the same webbaselet scope. Type-specific rules are semantic constraints and should be enforced by runtime logic or XSD 1.1 assertions.</xs:documentation>
+      </xs:annotation>
+      <xs:selector xpath=".//wbol:content/wbol:options/wbol:option" />
+      <xs:field xpath="@target" />
     </xs:keyref>
   </xs:element>
 
   <xs:complexType name="WebbaseType">
     <xs:all>
-      <xs:element name="datasources" type="DatasourcesType" minOccurs="0"/>
-      <xs:element name="roles" type="RolesType"/>
-      <xs:element name="name" type="NameType"/>
-      <xs:element name="documentation" type="DocumentationType" minOccurs="0"/>
-      <xs:element name="visibilities" type="VisibilitiesType" minOccurs="0"/>
-      <xs:element name="children" type="ChildrenType"/>
+      <xs:element name="datasources" type="DatasourcesType" minOccurs="0" />
+      <xs:element name="roles" type="RolesType" />
+      <xs:element name="name" type="NameType" />
+      <xs:element name="documentation" type="DocumentationType" minOccurs="0" />
+      <xs:element name="visibilities" type="VisibilitiesType" minOccurs="0" />
+      <xs:element name="children" type="ChildrenType" />
     </xs:all>
-    <xs:attribute name="guid" type="WebbaseGuidType" use="required"/>
-    <xs:attribute name="homepage" type="PageGuidType" use="required"/>
-    <xs:attribute name="url" type="xs:anyURI" use="required"/>
-    <xs:attribute name="defaultLanguage" type="xs:language" use="required"/>
+    <xs:attribute name="guid" type="WebbaseGuidType" use="required" />
+    <xs:attribute name="homepage" type="PageGuidType" use="required" />
+    <xs:attribute name="protocol" type="ProtocolType" use="optional" default="https://" />
+    <xs:attribute name="defaultLanguage" type="xs:language" use="required" />
   </xs:complexType>
 
   <xs:simpleType name="WebbaseGuidType">
     <xs:restriction base="xs:token">
-      <xs:pattern value="w[0-9A-Za-z]+"/>
+      <xs:pattern value="w[0-9A-Za-z]+" />
     </xs:restriction>
   </xs:simpleType>
 
   <xs:simpleType name="AreaGuidType">
     <xs:restriction base="xs:token">
-      <xs:pattern value="a[0-9A-Za-z]+"/>
+      <xs:pattern value="a[0-9A-Za-z]+" />
     </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="OriginGuidType">
+    <xs:union memberTypes="WebbaseGuidType AreaGuidType" />
   </xs:simpleType>
 
   <xs:simpleType name="PageGuidType">
     <xs:restriction base="xs:token">
-      <xs:pattern value="p[0-9A-Za-z]+"/>
+      <xs:pattern value="p[0-9A-Za-z]+" />
     </xs:restriction>
   </xs:simpleType>
 
   <xs:simpleType name="ContentGuidType">
     <xs:restriction base="xs:token">
-      <xs:pattern value="c[0-9A-Za-z]+"/>
+      <xs:pattern value="c[0-9A-Za-z]+" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="OptionTargetGuidType">
+    <xs:annotation>
+      <xs:documentation>Union of guid types that an option can point to. Additional keyrefs narrow the allowed subset by content type.</xs:documentation>
+    </xs:annotation>
+    <xs:union memberTypes="WebbaseGuidType AreaGuidType PageGuidType ContentGuidType" />
+  </xs:simpleType>
+
+  <xs:simpleType name="ProtocolType">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="http://" />
+      <xs:enumeration value="https://" />
     </xs:restriction>
   </xs:simpleType>
 
   <xs:simpleType name="SlugType">
     <xs:restriction base="xs:token">
-      <xs:pattern value="[a-z0-9]+(-[a-z0-9]+)*"/>
+      <xs:pattern value="[a-z0-9]+(-[a-z0-9]+)*" />
     </xs:restriction>
   </xs:simpleType>
 
   <xs:simpleType name="VisibilityLiteralType">
     <xs:restriction base="xs:token">
-      <xs:enumeration value="true"/>
-      <xs:enumeration value="false"/>
+      <xs:enumeration value="true" />
+      <xs:enumeration value="false" />
     </xs:restriction>
   </xs:simpleType>
 
   <xs:simpleType name="VisibilityFunctionCallType">
     <xs:restriction base="xs:token">
-      <xs:pattern value="[A-Za-z_][A-Za-z0-9_]*\(\)"/>
+      <xs:pattern value="[A-Za-z_][A-Za-z0-9_]*\(\)" />
     </xs:restriction>
   </xs:simpleType>
 
   <xs:simpleType name="VisibilityValueType">
-    <xs:union memberTypes="wbl:VisibilityLiteralType wbl:VisibilityFunctionCallType"/>
+    <xs:union memberTypes="VisibilityLiteralType VisibilityFunctionCallType" />
   </xs:simpleType>
 
   <xs:simpleType name="VisibilityFunctionResultType">
     <xs:restriction base="xs:token">
-      <xs:enumeration value="true"/>
-      <xs:enumeration value="false"/>
-      <xs:enumeration value="null"/>
+      <xs:enumeration value="true" />
+      <xs:enumeration value="false" />
+      <xs:enumeration value="null" />
     </xs:restriction>
   </xs:simpleType>
 
   <xs:simpleType name="ContentKindType">
     <xs:restriction base="xs:token">
-      <xs:enumeration value="text"/>
-      <xs:enumeration value="table"/>
-      <xs:enumeration value="form"/>
-      <xs:enumeration value="list"/>
-      <xs:enumeration value="graph"/>
-      <xs:enumeration value="plots"/>
-      <xs:enumeration value="calendar"/>
-      <xs:enumeration value="tree"/>
-      <xs:enumeration value="tabs"/>
-      <xs:enumeration value="menu"/>
-      <xs:enumeration value="breadcrumbs"/>
-      <xs:enumeration value="navigationindex"/>
-      <xs:enumeration value="imagemaps"/>
-      <xs:enumeration value="serverside"/>
-      <xs:enumeration value="clientside"/>
+      <xs:enumeration value="text" />
+      <xs:enumeration value="table" />
+      <xs:enumeration value="form" />
+      <xs:enumeration value="list" />
+      <xs:enumeration value="graph" />
+      <xs:enumeration value="plots" />
+      <xs:enumeration value="calendar" />
+      <xs:enumeration value="tree" />
+      <xs:enumeration value="tabs" />
+      <xs:enumeration value="accordion" />
+      <xs:enumeration value="menu" />
+      <xs:enumeration value="breadcrumbs" />
+      <xs:enumeration value="keypad" />
+      <xs:enumeration value="imagemap" />
+      <xs:enumeration value="map" />
+      <xs:enumeration value="serverside" />
+      <xs:enumeration value="clientside" />
     </xs:restriction>
   </xs:simpleType>
 
   <xs:simpleType name="SectionType">
     <xs:restriction base="xs:token">
       <!-- Layout sections -->
-      <xs:enumeration value="header"/>
-      <xs:enumeration value="footer"/>
-      <xs:enumeration value="main"/>
-      <xs:enumeration value="aside-left"/>
-      <xs:enumeration value="aside-right"/>
+      <xs:enumeration value="header" />
+      <xs:enumeration value="footer" />
+      <xs:enumeration value="main" />
+      <xs:enumeration value="aside-left" />
+      <xs:enumeration value="aside-right" />
       <!-- Overlay sections -->
-      <xs:enumeration value="popup"/>
-      <xs:enumeration value="dialog"/>
-      <xs:enumeration value="window"/>
+      <xs:enumeration value="popup" />
+      <xs:enumeration value="dialog" />
+      <xs:enumeration value="window" />
       <!-- Notification sections -->
-      <xs:enumeration value="alert"/>
-      <xs:enumeration value="warning"/>
-      <xs:enumeration value="messages"/>
+      <xs:enumeration value="alert" />
+      <xs:enumeration value="warning" />
+      <xs:enumeration value="messages" />
     </xs:restriction>
   </xs:simpleType>
 
   <xs:simpleType name="PredefinedRoleIdType">
     <xs:restriction base="xs:token">
-      <xs:enumeration value="root"/>
-      <xs:enumeration value="administrators"/>
-      <xs:enumeration value="guests"/>
-      <xs:enumeration value="users"/>
-      <xs:enumeration value="developers"/>
-      <xs:enumeration value="translators"/>
-      <xs:enumeration value="seo"/>
+      <xs:enumeration value="root" />
+      <xs:enumeration value="administrators" />
+      <xs:enumeration value="guests" />
+      <xs:enumeration value="users" />
+      <xs:enumeration value="developers" />
+      <xs:enumeration value="translators" />
+      <xs:enumeration value="seo" />
     </xs:restriction>
   </xs:simpleType>
 
   <xs:simpleType name="CustomRoleIdType">
     <xs:restriction base="xs:token">
-      <xs:pattern value="[A-Za-z][A-Za-z0-9_-]*"/>
+      <xs:pattern value="[A-Za-z][A-Za-z0-9_-]*" />
     </xs:restriction>
   </xs:simpleType>
 
   <xs:simpleType name="RoleIdType">
-    <xs:union memberTypes="wbl:PredefinedRoleIdType wbl:CustomRoleIdType"/>
+    <xs:union memberTypes="PredefinedRoleIdType CustomRoleIdType" />
   </xs:simpleType>
 
   <xs:complexType name="RolesType">
     <xs:sequence>
       <!-- A webbase must declare at least the seven mandatory preset roles. -->
-      <xs:element name="role" type="PortalRoleType" minOccurs="7" maxOccurs="unbounded"/>
+      <xs:element name="role" type="PortalRoleType" minOccurs="7" maxOccurs="unbounded" />
     </xs:sequence>
   </xs:complexType>
 
   <xs:complexType name="PortalRoleType">
-    <xs:attribute name="id" type="RoleIdType" use="required"/>
+    <xs:attribute name="id" type="RoleIdType" use="required" />
   </xs:complexType>
 
   <xs:complexType name="ChildrenType">
     <xs:sequence>
       <xs:choice maxOccurs="unbounded">
-        <xs:element name="area" type="AreaType"/>
-        <xs:element name="webbaselet" type="AreaType"/>
-        <xs:element name="page" type="PageType"/>
-        <xs:element name="content" type="ContentType"/>
-        <xs:element name="shortcut" type="ShortcutType"/>
+        <xs:element name="area" type="AreaType" />
+        <xs:element name="webbaselet" type="NestedWebbaseletType" />
+        <xs:element name="page" type="PageType" />
+        <xs:element name="content" type="ContentType" />
+        <xs:element name="shortcut" type="ShortcutType" />
       </xs:choice>
     </xs:sequence>
   </xs:complexType>
@@ -262,199 +272,229 @@
   <xs:complexType name="PageChildrenType">
     <xs:sequence>
       <xs:choice maxOccurs="unbounded">
-        <xs:element name="content" type="ContentType"/>
-        <xs:element name="shortcut" type="ShortcutType"/>
+        <xs:element name="content" type="ContentType" />
+        <xs:element name="shortcut" type="ShortcutType" />
       </xs:choice>
     </xs:sequence>
   </xs:complexType>
 
   <xs:complexType name="AreaType">
     <xs:all>
-      <xs:element name="name" type="NameType"/>
-      <xs:element name="visibilities" type="VisibilitiesType" minOccurs="0"/>
-      <xs:element name="documentation" type="DocumentationType" minOccurs="0"/>
+      <xs:element name="name" type="NameType" />
+      <xs:element name="visibilities" type="VisibilitiesType" minOccurs="0" />
+      <xs:element name="documentation" type="DocumentationType" minOccurs="0" />
       <xs:element name="children" minOccurs="0">
         <xs:complexType>
           <xs:sequence>
             <xs:choice maxOccurs="unbounded">
-              <xs:element name="area" type="AreaType"/>
-              <xs:element name="webbaselet" type="AreaType"/>
-              <xs:element name="page" type="PageType"/>
-              <xs:element name="content" type="ContentType"/>
-              <xs:element name="shortcut" type="ShortcutType"/>
+              <xs:element name="area" type="AreaType" />
+              <xs:element name="page" type="PageType" />
+              <xs:element name="content" type="ContentType" />
+              <xs:element name="shortcut" type="ShortcutType" />
             </xs:choice>
           </xs:sequence>
         </xs:complexType>
       </xs:element>
     </xs:all>
-    <xs:attribute name="guid" type="AreaGuidType" use="required"/>
-    <xs:attribute name="mainpage" type="PageGuidType" use="optional"/>
-    <xs:attribute name="src" type="xs:anyURI" use="optional"/>
-    <xs:attribute name="sequence" type="xs:decimal" use="optional"/>
-    <xs:attribute name="version" type="xs:token" use="optional"/>
+    <xs:attribute name="guid" type="AreaGuidType" use="required" />
+    <xs:attribute name="origin" type="OriginGuidType" use="required" />
+    <xs:attribute name="mainpage" type="PageGuidType" use="optional" />
+    <xs:attribute name="src" type="xs:anyURI" use="optional" />
+    <xs:attribute name="sequence" type="xs:decimal" use="optional" />
+  </xs:complexType>
+
+  <xs:complexType name="NestedWebbaseletType">
+    <xs:all>
+      <xs:element name="name" type="NameType" />
+      <xs:element name="visibilities" type="VisibilitiesType" minOccurs="0" />
+      <xs:element name="documentation" type="DocumentationType" minOccurs="0" />
+      <xs:element name="children" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:choice maxOccurs="unbounded">
+              <xs:element name="area" type="AreaType" />
+              <xs:element name="webbaselet" type="NestedWebbaseletType" />
+              <xs:element name="page" type="PageType" />
+              <xs:element name="content" type="ContentType" />
+              <xs:element name="shortcut" type="ShortcutType" />
+            </xs:choice>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:all>
+    <xs:attribute name="guid" type="AreaGuidType" use="required" />
+    <xs:attribute name="origin" type="OriginGuidType" use="required" />
+    <xs:attribute name="mainpage" type="PageGuidType" use="optional" />
+    <xs:attribute name="src" type="xs:anyURI" use="optional" />
+    <xs:attribute name="sequence" type="xs:decimal" use="optional" />
+    <xs:attribute name="version" type="xs:token" use="optional" />
+  </xs:complexType>
+
+  <!-- Root webbaselets behave like root webbases: no origin, but version is required. -->
+  <xs:complexType name="WebbaseletType">
+    <xs:all>
+      <xs:element name="name" type="NameType" />
+      <xs:element name="visibilities" type="VisibilitiesType" minOccurs="0" />
+      <xs:element name="documentation" type="DocumentationType" minOccurs="0" />
+      <xs:element name="children" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:choice maxOccurs="unbounded">
+              <xs:element name="area" type="AreaType" />
+              <xs:element name="webbaselet" type="NestedWebbaseletType" />
+              <xs:element name="page" type="PageType" />
+              <xs:element name="content" type="ContentType" />
+              <xs:element name="shortcut" type="ShortcutType" />
+            </xs:choice>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:all>
+    <xs:attribute name="guid" type="AreaGuidType" use="required" />
+    <xs:attribute name="mainpage" type="PageGuidType" use="optional" />
+    <xs:attribute name="src" type="xs:anyURI" use="optional" />
+    <xs:attribute name="sequence" type="xs:decimal" use="optional" />
+    <xs:attribute name="version" type="xs:token" use="required" />
   </xs:complexType>
 
   <xs:complexType name="PageType">
     <xs:all>
-      <xs:element name="name" type="NameType"/>
-      <xs:element name="keywords" type="KeywordsType"/>
-      <xs:element name="description" type="KeywordsType"/>
-      <xs:element name="visibilities" type="VisibilitiesType" minOccurs="0"/>
-      <xs:element name="documentation" type="DocumentationType" minOccurs="0"/>
-      <xs:element name="children" type="PageChildrenType" minOccurs="0"/>
+      <xs:element name="name" type="NameType" />
+      <xs:element name="keywords" type="KeywordsType" />
+      <xs:element name="description" type="KeywordsType" />
+      <xs:element name="visibilities" type="VisibilitiesType" minOccurs="0" />
+      <xs:element name="documentation" type="DocumentationType" minOccurs="0" />
+      <xs:element name="children" type="PageChildrenType" minOccurs="0" />
     </xs:all>
-    <xs:attribute name="guid" type="PageGuidType" use="required"/>
-    <xs:attribute name="template" type="xs:anyURI" use="optional" default="index.html"/>
-    <xs:attribute name="sequence" type="xs:decimal" use="optional"/>
+    <xs:attribute name="guid" type="PageGuidType" use="required" />
+    <xs:attribute name="origin" type="OriginGuidType" use="required" />
+    <xs:attribute name="template" type="xs:anyURI" use="optional" default="index.html" />
+    <xs:attribute name="sequence" type="xs:decimal" use="optional" />
   </xs:complexType>
 
   <xs:complexType name="DatasourcesType">
     <xs:sequence>
-      <xs:element name="datasource" type="DatasourceType" maxOccurs="unbounded"/>
+      <xs:element name="datasource" type="DatasourceType" maxOccurs="unbounded" />
     </xs:sequence>
   </xs:complexType>
 
   <xs:complexType name="DatasourceType">
-    <xs:attribute name="id" type="xs:token" use="required"/>
-    <xs:attribute name="queryLanguage" type="xs:token" use="required"/>
-    <xs:attribute name="connection-string" type="xs:string" use="required"/>
+    <xs:attribute name="id" type="xs:token" use="required" />
+    <xs:attribute name="queryLanguage" type="xs:token" use="required" />
+    <xs:attribute name="connection-string" type="xs:string" use="required" />
   </xs:complexType>
 
   <xs:complexType name="ContentType">
+    <xs:annotation>
+      <xs:documentation>The options child is syntactically available on content. Intended use is for menu, tabs, and accordion content; additional type-specific restrictions are semantic and should be enforced by runtime logic or XSD 1.1 assertions.</xs:documentation>
+    </xs:annotation>
     <xs:all>
-      <xs:element name="name" type="NameType"/>
-      <xs:element name="query" type="QueryType"/>
-      <xs:element name="parameters" type="xs:string" minOccurs="0"/>
-      <xs:element name="layouts" type="LayoutsType" minOccurs="0"/>
-      <xs:element name="documentation" type="DocumentationType" minOccurs="0"/>
-      <xs:element name="tabsOptions" type="TabsOptionsType" minOccurs="0"/>
-      <xs:element name="menuOptions" type="MenuOptionsType" minOccurs="0"/>
-      <xs:element name="visibilities" type="VisibilitiesType" minOccurs="0"/>
+      <xs:element name="name" type="NameType" />
+      <xs:element name="query" type="QueryType" />
+      <xs:element name="parameters" type="xs:string" minOccurs="0" />
+      <xs:element name="layouts" type="LayoutsType" minOccurs="0" />
+      <xs:element name="documentation" type="DocumentationType" minOccurs="0" />
+      <xs:element name="options" type="OptionsType" minOccurs="0" />
+      <xs:element name="visibilities" type="VisibilitiesType" minOccurs="0" />
     </xs:all>
-    <xs:attribute name="guid" type="ContentGuidType" use="required"/>
-    <xs:attribute name="type" type="ContentKindType" use="required"/>
-    <xs:attribute name="section" type="SectionType" use="required"/>
-    <xs:attribute name="sequence" type="xs:decimal" use="required"/>
-    <xs:attribute name="class" type="xs:token" use="optional"/>
+    <xs:attribute name="guid" type="ContentGuidType" use="required" />
+    <xs:attribute name="origin" type="OriginGuidType" use="required" />
+    <xs:attribute name="type" type="ContentKindType" use="required" />
+    <xs:attribute name="section" type="SectionType" use="optional" />
+    <xs:attribute name="sequence" type="xs:decimal" use="optional" />
+    <xs:attribute name="class" type="xs:token" use="optional" />
   </xs:complexType>
 
   <xs:complexType name="ShortcutType">
     <xs:sequence>
-      <xs:element name="name" type="NameType"/>
-      <xs:element name="visibilities" type="VisibilitiesType" minOccurs="0"/>
+      <xs:element name="name" type="NameType" />
+      <xs:element name="visibilities" type="VisibilitiesType" minOccurs="0" />
     </xs:sequence>
-    <xs:attribute name="guid" type="ContentGuidType" use="required"/>
-    <xs:attribute name="content" type="ContentGuidType" use="required"/>
-    <xs:attribute name="section" type="SectionType" use="required"/>
-    <xs:attribute name="sequence" type="xs:decimal" use="required"/>
-    <xs:attribute name="class" type="xs:token" use="required"/>
+    <xs:attribute name="guid" type="ContentGuidType" use="required" />
+    <xs:attribute name="origin" type="OriginGuidType" use="required" />
+    <xs:attribute name="target" type="ContentGuidType" use="required" />
+    <xs:attribute name="section" type="SectionType" use="optional" />
+    <xs:attribute name="sequence" type="xs:decimal" use="optional" />
+    <xs:attribute name="class" type="xs:token" use="required" />
   </xs:complexType>
 
   <xs:complexType name="NameType">
     <xs:sequence>
-      <xs:element name="text" type="NameTextType" maxOccurs="unbounded"/>
+      <xs:element name="text" type="NameTextType" maxOccurs="unbounded" />
     </xs:sequence>
   </xs:complexType>
 
   <xs:complexType name="KeywordsType">
     <xs:sequence>
-      <xs:element name="text" type="LocalizedTextType" maxOccurs="unbounded"/>
+      <xs:element name="text" type="LocalizedTextType" maxOccurs="unbounded" />
     </xs:sequence>
   </xs:complexType>
 
   <xs:complexType name="LocalizedTextType" mixed="true">
-    <xs:attribute ref="xml:lang" use="required"/>
+    <xs:attribute ref="xml:lang" use="required" />
   </xs:complexType>
 
   <xs:complexType name="NameTextType" mixed="true">
-    <xs:attribute ref="xml:lang" use="required"/>
-    <xs:attribute name="slug" type="SlugType" use="required"/>
+    <xs:attribute ref="xml:lang" use="required" />
+    <xs:attribute name="slug" type="SlugType" use="required" />
   </xs:complexType>
 
   <xs:complexType name="QueryType" mixed="true">
-    <xs:attribute name="datasource" type="xs:token" use="required"/>
+    <xs:attribute name="datasource" type="xs:token" use="optional" />
   </xs:complexType>
 
   <xs:complexType name="LayoutsType">
     <xs:sequence>
-      <xs:element name="text" type="LocalizedTextType" maxOccurs="unbounded"/>
+      <xs:element name="text" type="LocalizedTextType" maxOccurs="unbounded" />
     </xs:sequence>
   </xs:complexType>
 
   <xs:complexType name="DocumentationType">
     <xs:sequence>
-      <xs:element name="text" type="DocumentationTextType" maxOccurs="unbounded"/>
+      <xs:element name="text" type="DocumentationTextType" maxOccurs="unbounded" />
     </xs:sequence>
   </xs:complexType>
 
   <xs:complexType name="DocumentationTextType" mixed="true">
-    <xs:attribute ref="xml:lang" use="optional"/>
-    <xs:attribute name="format" type="xs:string" use="required"/>
+    <xs:attribute ref="xml:lang" use="optional" />
+    <xs:attribute name="format" type="xs:string" use="required" />
   </xs:complexType>
 
   <xs:complexType name="LabelType">
     <xs:sequence>
-      <xs:element name="text" type="LocalizedTextType" maxOccurs="unbounded"/>
+      <xs:element name="text" type="LocalizedTextType" maxOccurs="unbounded" />
     </xs:sequence>
   </xs:complexType>
 
-  <xs:complexType name="TabsOptionsType">
+  <xs:complexType name="OptionsType">
+    <xs:annotation>
+      <xs:documentation>Optional options container. It may be empty to support staged authoring.</xs:documentation>
+    </xs:annotation>
     <xs:sequence>
-      <xs:element name="option" type="TabOptionType" maxOccurs="unbounded"/>
+      <xs:element name="option" type="OptionType" minOccurs="0" maxOccurs="unbounded" />
     </xs:sequence>
   </xs:complexType>
 
-  <xs:complexType name="TabOptionType">
+  <xs:complexType name="OptionType">
+    <xs:annotation>
+      <xs:documentation>An option target drives behavior: menu navigates (area uses mainpage, webbase uses homepage), while content targets render content. Label overrides display name when provided. Parameters is a querystring payload appended or passed at render time.</xs:documentation>
+    </xs:annotation>
     <xs:sequence>
-      <xs:element name="label" type="LabelType"/>
-      <xs:element name="parameters" type="xs:string"/>
+      <xs:element name="label" type="LabelType" minOccurs="0" />
+      <xs:element name="parameters" type="xs:string" />
     </xs:sequence>
-    <xs:attribute name="guid" type="ContentGuidType" use="required"/>
-  </xs:complexType>
-
-  <xs:complexType name="MenuOptionsType">
-    <xs:sequence>
-      <xs:choice maxOccurs="unbounded">
-        <xs:element name="areaOption" type="AreaOptionType"/>
-        <xs:element name="pageOption" type="PageOptionType"/>
-        <xs:element name="contentOption" type="ContentOptionType"/>
-      </xs:choice>
-    </xs:sequence>
-  </xs:complexType>
-
-  <xs:complexType name="AreaOptionType">
-    <xs:sequence>
-      <xs:element name="label" type="LabelType"/>
-      <xs:element name="parameters" type="xs:string"/>
-    </xs:sequence>
-    <xs:attribute name="guid" type="AreaGuidType" use="required"/>
-  </xs:complexType>
-
-  <xs:complexType name="PageOptionType">
-    <xs:sequence>
-      <xs:element name="label" type="LabelType"/>
-      <xs:element name="parameters" type="xs:string"/>
-    </xs:sequence>
-    <xs:attribute name="guid" type="PageGuidType" use="required"/>
-  </xs:complexType>
-
-  <xs:complexType name="ContentOptionType">
-    <xs:sequence>
-      <xs:element name="label" type="LabelType"/>
-      <xs:element name="parameters" type="xs:string"/>
-    </xs:sequence>
-    <xs:attribute name="guid" type="ContentGuidType" use="required"/>
+    <xs:attribute name="target" type="OptionTargetGuidType" use="required" />
   </xs:complexType>
 
   <xs:complexType name="VisibilitiesType">
     <xs:sequence>
-      <xs:element name="role" type="RoleType" maxOccurs="unbounded"/>
+      <xs:element name="role" type="RoleType" maxOccurs="unbounded" />
     </xs:sequence>
   </xs:complexType>
 
   <xs:complexType name="RoleType">
-    <xs:attribute name="id" type="RoleIdType" use="required"/>
-    <xs:attribute name="visibility" type="VisibilityValueType" use="required"/>
+    <xs:attribute name="id" type="RoleIdType" use="required" />
+    <xs:attribute name="visibility" type="VisibilityValueType" use="required" />
   </xs:complexType>
 
 </xs:schema>
