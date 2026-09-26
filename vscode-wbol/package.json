@@ -1,0 +1,41 @@
+{
+  "name": "wbol-language-support",
+  "displayName": "WBOL Language Support",
+  "description": "Language support for WBOL (Webbase Ontology Language) including XML schema validation.",
+  "version": "0.0.1",
+  "publisher": "Giancarlo Trevisan",
+  "engines": {
+    "vscode": "^1.80.0"
+  },
+
+  "categories": [
+    "Programming Languages",
+    "Linters"
+  ],
+
+  "contributes": {
+    "languages": [
+      {
+        "id": "wbol",
+        "aliases": ["WBOL", "wbol"],
+        "extensions": [".wbol"],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+
+    "grammars": [
+      {
+        "language": "wbol",
+        "scopeName": "text.xml.wbol",
+        "path": "./syntaxes/wbol.tmLanguage.json"
+      }
+    ],
+
+    "xml.fileAssociations": [
+      {
+        "pattern": "**/*.wbol",
+        "systemId": "schemas/wbol.xsd"
+      }
+    ]
+  }
+}
