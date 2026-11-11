@@ -385,6 +385,10 @@
 	</xs:complexType>
 
 	<xs:complexType name="ConnectorType">
+		<xs:annotation>
+			<xs:documentation>WBOL identifies a connector and its native query language without
+				restricting the backend to a particular database vendor or data model.</xs:documentation>
+		</xs:annotation>
 		<xs:attribute name="id" type="xs:token" use="required" />
 		<xs:attribute name="queryLanguage" type="xs:token" use="required" />
 		<xs:attribute name="connection-string" type="xs:string" use="required" />
