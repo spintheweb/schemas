@@ -101,7 +101,7 @@
 
 	<xs:complexType name="WebbaseType">
 		<xs:all>
-			<xs:element name="datasources" type="DatasourcesType" minOccurs="0" />
+			<xs:element name="connectors" type="ConnectorsType" minOccurs="0" />
 			<xs:element name="name" type="NameType" />
 			<xs:element name="documentation" type="DocumentationType" minOccurs="0" />
 			<!-- Also the role registry: declares every role in the webbase with its default visibility -->
@@ -378,13 +378,13 @@
 		<xs:attribute name="sequence" type="xs:decimal" use="optional" />
 	</xs:complexType>
 
-	<xs:complexType name="DatasourcesType">
+	<xs:complexType name="ConnectorsType">
 		<xs:sequence>
-			<xs:element name="datasource" type="DatasourceType" maxOccurs="unbounded" />
+			<xs:element name="connector" type="ConnectorType" maxOccurs="unbounded" />
 		</xs:sequence>
 	</xs:complexType>
 
-	<xs:complexType name="DatasourceType">
+	<xs:complexType name="ConnectorType">
 		<xs:attribute name="id" type="xs:token" use="required" />
 		<xs:attribute name="queryLanguage" type="xs:token" use="required" />
 		<xs:attribute name="connection-string" type="xs:string" use="required" />
@@ -447,7 +447,7 @@
 	</xs:complexType>
 
 	<xs:complexType name="QueryType" mixed="true">
-		<xs:attribute name="datasource" type="xs:token" use="optional" />
+		<xs:attribute name="connector" type="xs:token" use="optional" />
 		<xs:attribute name="parameters" type="xs:string" use="optional" />
 	</xs:complexType>
 

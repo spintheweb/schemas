@@ -20,8 +20,8 @@
                 <xsd:element name="webbase">
                     <xsd:complexType>
                         <xsd:sequence>
-                            <xsd:element name="datasources" minOccurs="0"
-                                type="wbol:datasourcesType">
+                            <xsd:element name="connectors" minOccurs="0"
+                                type="wbol:connectorsType">
                             </xsd:element>
                             <xsd:element name="security" type="wbol:securityType">
                             </xsd:element>
@@ -62,7 +62,7 @@
                 <xsd:element name="webbaselet">
                     <xsd:complexType>
                         <xsd:sequence>
-                            <xsd:element name="datasources" type="wbol:datasourcesType"
+                            <xsd:element name="connectors" type="wbol:connectorsType"
                                 minOccurs="0" />
                             <xsd:element name="security" type="wbol:securityType" minOccurs="0"
                                 maxOccurs="1" />
@@ -130,7 +130,7 @@
                 <xsd:complexType>
                     <xsd:simpleContent>
                         <xsd:extension base="xsd:string">
-                            <xsd:attribute name="datasource" type="xsd:IDREF" />
+                            <xsd:attribute name="connector" type="xsd:IDREF" />
                             <xsd:attribute name="parameters" type="xsd:normalizedString" />
                         </xsd:extension>
                     </xsd:simpleContent>
@@ -198,9 +198,9 @@
         </xsd:sequence>
         <xsd:attribute name="id" type="xsd:long" />
     </xsd:complexType>
-    <xsd:complexType name="datasourcesType">
+    <xsd:complexType name="connectorsType">
         <xsd:sequence maxOccurs="unbounded">
-            <xsd:element name="datasource">
+            <xsd:element name="connector">
                 <xsd:complexType>
                     <xsd:simpleContent>
                         <xsd:extension base="xsd:normalizedString">
