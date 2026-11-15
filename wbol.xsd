@@ -212,7 +212,9 @@
 			<xs:enumeration value="tree" />
 			<xs:enumeration value="tabs" />
 			<xs:enumeration value="accordion" />
-			<xs:enumeration value="menu" />
+			<xs:enumeration value="menus" />
+			<xs:enumeration value="geomap" />
+			<xs:enumeration value="languages" />
 			<xs:enumeration value="breadcrumbs" />
 			<xs:enumeration value="keypad" />
 			<xs:enumeration value="imagemap" />
@@ -244,11 +246,11 @@
 	<xs:simpleType name="PredefinedRoleIdType">
 		<xs:restriction base="xs:token">
 			<xs:enumeration value="root" />
-			<xs:enumeration value="administrators" />
-			<xs:enumeration value="guests" />
-			<xs:enumeration value="users" />
-			<xs:enumeration value="developers" />
-			<xs:enumeration value="translators" />
+			<xs:enumeration value="administrator" />
+			<xs:enumeration value="guest" />
+			<xs:enumeration value="user" />
+			<xs:enumeration value="developer" />
+			<xs:enumeration value="leaddeveloper" />
 			<xs:enumeration value="seo" />
 		</xs:restriction>
 	</xs:simpleType>
@@ -513,7 +515,7 @@
 
 	<xs:complexType name="RoleType">
 		<xs:attribute name="id" type="RoleIdType" use="required" />
-		<xs:attribute name="visibility" type="VisibilityValueType" use="required" />
+		<xs:attribute name="visibility" type="VisibilityValueType" use="optional" default="false" />
 	</xs:complexType>
 
 </xs:schema>
