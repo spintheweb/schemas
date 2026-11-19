@@ -307,6 +307,7 @@
 		<xs:attribute name="uuid" type="AreaUuidType" use="required" />
 		<xs:attribute name="origin" type="OriginUuidType" use="required" />
 		<xs:attribute name="mainpage" type="PageUuidType" use="optional" />
+		<xs:attribute name="inheritContents" type="xs:boolean" use="optional" default="true" />
 		<xs:attribute name="src" type="xs:anyURI" use="optional" />
 		<xs:attribute name="sequence" type="xs:decimal" use="optional" />
 	</xs:complexType>
@@ -333,6 +334,7 @@
 		<xs:attribute name="uuid" type="AreaUuidType" use="required" />
 		<xs:attribute name="origin" type="OriginUuidType" use="required" />
 		<xs:attribute name="mainpage" type="PageUuidType" use="optional" />
+		<xs:attribute name="inheritContents" type="xs:boolean" use="optional" default="true" />
 		<xs:attribute name="src" type="xs:anyURI" use="optional" />
 		<xs:attribute name="sequence" type="xs:decimal" use="optional" />
 		<xs:attribute name="version" type="xs:token" use="optional" />
@@ -360,6 +362,7 @@
 		</xs:all>
 		<xs:attribute name="uuid" type="AreaUuidType" use="required" />
 		<xs:attribute name="mainpage" type="PageUuidType" use="optional" />
+		<xs:attribute name="inheritContents" type="xs:boolean" use="optional" default="true" />
 		<xs:attribute name="src" type="xs:anyURI" use="optional" />
 		<xs:attribute name="sequence" type="xs:decimal" use="optional" />
 		<xs:attribute name="version" type="xs:token" use="required" />
