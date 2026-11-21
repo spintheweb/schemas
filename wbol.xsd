@@ -31,10 +31,6 @@
 			<xs:selector xpath="." />
 			<xs:field xpath="@mainpage" />
 		</xs:keyref>
-		<xs:keyref name="shortcutTargetRef" refer="contentUuids">
-			<xs:selector xpath=".//wbol:shortcut" />
-			<xs:field xpath="@target" />
-		</xs:keyref>
 		<xs:keyref name="areaMainpageRef" refer="pageUuids">
 			<xs:selector xpath=".//wbol:area | .//wbol:webbaselet" />
 			<xs:field xpath="@mainpage" />
@@ -80,10 +76,6 @@
 			<xs:selector xpath="." />
 			<xs:field xpath="@mainpage" />
 		</xs:keyref>
-		<xs:keyref name="shortcutTargetRefInWebbaselet" refer="contentUuidsInWebbaselet">
-			<xs:selector xpath=".//wbol:shortcut" />
-			<xs:field xpath="@target" />
-		</xs:keyref>
 		<xs:keyref name="areaMainpageRefInWebbaselet" refer="pageUuidsInWebbaselet">
 			<xs:selector xpath=". | .//wbol:area | .//wbol:webbaselet" />
 			<xs:field xpath="@mainpage" />
@@ -101,12 +93,12 @@
 
 	<xs:complexType name="WebbaseType">
 		<xs:all>
-			<xs:element name="connectors" type="ConnectorsType" minOccurs="0" />
 			<xs:element name="name" type="NameType" />
-			<xs:element name="documentation" type="DocumentationType" minOccurs="0" />
+			<xs:element name="connectors" type="ConnectorsType" minOccurs="0" />
+			<xs:element name="documentation" type="DocumentationType" minOccurs="0" maxOccurs="1" />
 			<!-- Also the role registry: declares every role in the webbase with its default visibility -->
-			<xs:element name="visibility" type="WebbaseVisibilityType" />
-			<xs:element name="children" type="ChildrenType" />
+			<xs:element name="visibility" type="WebbaseVisibilityType" minOccurs="0" />
+			<xs:element name="children" type="ChildrenType" minOccurs="1" maxOccurs="1" />
 		</xs:all>
 		<xs:attribute name="uuid" type="WebbaseUuidType" use="required" />
 		<xs:attribute name="mainpage" type="PageUuidType" use="required" />
@@ -221,6 +213,7 @@
 			<xs:enumeration value="map" />
 			<xs:enumeration value="serverside" />
 			<xs:enumeration value="clientside" />
+			<xs:enumeration value="shortcut" />
 		</xs:restriction>
 	</xs:simpleType>
 
@@ -230,12 +223,11 @@
 			<xs:enumeration value="header" />
 			<xs:enumeration value="footer" />
 			<xs:enumeration value="main" />
-			<xs:enumeration value="aside-left" />
-			<xs:enumeration value="aside-right" />
+			<xs:enumeration value="leftPanel" />
+			<xs:enumeration value="rightPanel" />
 			<!-- Overlay sections -->
-			<xs:enumeration value="popup" />
-			<xs:enumeration value="dialog" />
-			<xs:enumeration value="window" />
+			<xs:enumeration value="modeless" />
+			<xs:enumeration value="modal" />
 			<!-- Notification sections -->
 			<xs:enumeration value="alert" />
 			<xs:enumeration value="warning" />
@@ -252,6 +244,7 @@
 			<xs:enumeration value="developer" />
 			<xs:enumeration value="leaddeveloper" />
 			<xs:enumeration value="seo" />
+			<xs:enumeration value="ai" />
 		</xs:restriction>
 	</xs:simpleType>
 
@@ -272,7 +265,6 @@
 				<xs:element name="webbaselet" type="NestedWebbaseletType" />
 				<xs:element name="page" type="PageType" />
 				<xs:element name="content" type="ContentType" />
-				<xs:element name="shortcut" type="ShortcutType" />
 			</xs:choice>
 		</xs:sequence>
 	</xs:complexType>
@@ -281,7 +273,6 @@
 		<xs:sequence>
 			<xs:choice maxOccurs="unbounded">
 				<xs:element name="content" type="ContentType" />
-				<xs:element name="shortcut" type="ShortcutType" />
 			</xs:choice>
 		</xs:sequence>
 	</xs:complexType>
@@ -298,7 +289,6 @@
 							<xs:element name="area" type="AreaType" />
 							<xs:element name="page" type="PageType" />
 							<xs:element name="content" type="ContentType" />
-							<xs:element name="shortcut" type="ShortcutType" />
 						</xs:choice>
 					</xs:sequence>
 				</xs:complexType>
@@ -325,7 +315,6 @@
 							<xs:element name="webbaselet" type="NestedWebbaseletType" />
 							<xs:element name="page" type="PageType" />
 							<xs:element name="content" type="ContentType" />
-							<xs:element name="shortcut" type="ShortcutType" />
 						</xs:choice>
 					</xs:sequence>
 				</xs:complexType>
@@ -354,7 +343,6 @@
 							<xs:element name="webbaselet" type="NestedWebbaseletType" />
 							<xs:element name="page" type="PageType" />
 							<xs:element name="content" type="ContentType" />
-							<xs:element name="shortcut" type="ShortcutType" />
 						</xs:choice>
 					</xs:sequence>
 				</xs:complexType>
@@ -366,13 +354,14 @@
 		<xs:attribute name="src" type="xs:anyURI" use="optional" />
 		<xs:attribute name="sequence" type="xs:decimal" use="optional" />
 		<xs:attribute name="version" type="xs:token" use="required" />
+		<xs:attribute name="langs" type="LangsType" use="required" />
 	</xs:complexType>
 
 	<xs:complexType name="PageType">
 		<xs:all>
 			<xs:element name="name" type="NameType" />
-			<xs:element name="keywords" type="KeywordsType" />
-			<xs:element name="description" type="KeywordsType" />
+			<xs:element name="keywords" type="KeywordsType" minOccurs="0" />
+			<xs:element name="description" type="KeywordsType" minOccurs="0" />
 			<xs:element name="visibility" type="VisibilityType" minOccurs="0" />
 			<xs:element name="documentation" type="DocumentationType" minOccurs="0" />
 			<xs:element name="children" type="PageChildrenType" minOccurs="0" />
@@ -407,31 +396,19 @@
 		</xs:annotation>
 		<xs:all>
 			<xs:element name="name" type="NameType" />
-			<xs:element name="query" type="QueryType" />
-			<xs:element name="layout" type="LayoutType" minOccurs="0" />
-			<xs:element name="documentation" type="DocumentationType" minOccurs="0" />
-			<xs:element name="options" type="OptionsType" minOccurs="0" />
-			<xs:element name="visibility" type="VisibilityType" minOccurs="0" />
+			<xs:element name="query" type="QueryType" minOccurs="0" maxOccurs="1" />
+			<xs:element name="layout" type="LayoutType" minOccurs="0" maxOccurs="1" />
+			<xs:element name="documentation" type="DocumentationType" minOccurs="0" maxOccurs="1" />
+			<xs:element name="options" type="OptionsType" minOccurs="0" maxOccurs="1" />
+			<xs:element name="visibility" type="VisibilityType" minOccurs="0" maxOccurs="1" />
 		</xs:all>
 		<xs:attribute name="uuid" type="ContentUuidType" use="required" />
+		<xs:attribute name="ref" type="ContentUuidType" use="optional" />
 		<xs:attribute name="origin" type="OriginUuidType" use="required" />
-		<xs:attribute name="type" type="ContentKindType" use="required" />
+		<xs:attribute name="type" type="ContentKindType" use="optional" default="text" />
 		<xs:attribute name="section" type="SectionType" use="optional" />
 		<xs:attribute name="sequence" type="xs:decimal" use="optional" />
 		<xs:attribute name="class" type="xs:token" use="optional" />
-	</xs:complexType>
-
-	<xs:complexType name="ShortcutType">
-		<xs:sequence>
-			<xs:element name="name" type="NameType" />
-			<xs:element name="visibility" type="VisibilityType" minOccurs="0" />
-		</xs:sequence>
-		<xs:attribute name="uuid" type="ContentUuidType" use="required" />
-		<xs:attribute name="origin" type="OriginUuidType" use="required" />
-		<xs:attribute name="target" type="ContentUuidType" use="required" />
-		<xs:attribute name="section" type="SectionType" use="optional" />
-		<xs:attribute name="sequence" type="xs:decimal" use="optional" />
-		<xs:attribute name="class" type="xs:token" use="required" />
 	</xs:complexType>
 
 	<xs:complexType name="NameType">
